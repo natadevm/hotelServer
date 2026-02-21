@@ -14,18 +14,18 @@ const authRoutes = require("./routes/ authRoutes");
 app.use("/api/menu", menuRoutes);
 app.use("/api/auth", authRoutes);
 
-// Test route
+
 app.get("/", (req, res) => {
   res.json("API Running... to nati");
 });
 
-// MongoDB
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// Server
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
