@@ -2,12 +2,20 @@ const express = require("express");
 const router = express.Router();
 const Menu = require("../model/Menu");
 const authMiddleware = require("../middleware/authMiddleware");
+const upload = require("../middleware/upload");
 
-
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
   try {
-    const menu = new Menu(req.body);
-    const savedMenu = await menu.save();
+    const newMenu = new Menu({
+      name: req.body.name,
+      price: Number(req.body.price),
+      category: req.body.category,
+      description: req.body.description,
+      available: req.body.available === 'true',
+      image: req.file ? req.file.path : null,
+    });
+
+    const savedMenu = await newMenu.save();
     res.status(201).json(savedMenu);
   } catch (err) {
     res.status(400).json({ message: err.message });
