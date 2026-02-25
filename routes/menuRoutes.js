@@ -4,24 +4,31 @@ const Menu = require("../model/Menu");
 const authMiddleware = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload");
 
-router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
+router.put("/:id", authMiddleware, upload.single("image"), async (req, res) => {
   try {
-    const newMenu = new Menu({
+    const updateData = {
       name: req.body.name,
       price: Number(req.body.price),
       category: req.body.category,
       description: req.body.description,
       available: req.body.available === 'true',
-      image: req.file ? req.file.path : null,
-    });
+    };
 
-    const savedMenu = await newMenu.save();
-    res.status(201).json(savedMenu);
+    if (req.file) {
+      updateData.image = req.file.path; // Only update image if new one uploaded
+    }
+
+    const updatedMenu = await Menu.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    res.json(updatedMenu);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
-
 
 router.get("/", async (req, res) => {
   try {
