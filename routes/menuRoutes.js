@@ -4,6 +4,24 @@ const Menu = require("../model/Menu");
 const authMiddleware = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload");
 
+router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
+  try {
+    const newMenu = new Menu({
+      name: req.body.name,
+      price: Number(req.body.price),
+      category: req.body.category,
+      description: req.body.description,
+      available: req.body.available === 'true',
+      image: req.file ? req.file.path : null,
+    });
+
+    const savedMenu = await newMenu.save();
+    res.status(201).json(savedMenu);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 router.put("/:id", authMiddleware, upload.single("image"), async (req, res) => {
   try {
     const updateData = {
@@ -29,7 +47,6 @@ router.put("/:id", authMiddleware, upload.single("image"), async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
-
 router.get("/", async (req, res) => {
   try {
     const menus = await Menu.find();
